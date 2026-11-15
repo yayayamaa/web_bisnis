@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[NAMA BISNIS] — Jelajah Galaksi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKEN WARNA (edit di sini) ============ */
+:root{
+  --void:#05060f; --deep:#0d0a24; --violet:#7a5cff; --magenta:#ff4fa3;
+  --cyan:#4de1ff; --star:#f3f1ff; --dim:#a9a6c9;
+  --glass:rgba(18,14,48,.55); --line:rgba(160,150,255,.22);
+  --head:'Unbounded','Trebuchet MS',sans-serif; --body:'Outfit','Segoe UI',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--void);color:var(--star);font-family:var(--body);font-weight:300;line-height:1.7;overflow-x:hidden}
+#bg{position:fixed;inset:0;z-index:0;display:block}
+.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 40%,rgba(5,6,15,.85))}
+a{color:inherit;text-decoration:none}
+h1,h2,h3{font-family:var(--head);line-height:1.15;letter-spacing:-.02em}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:14px 5vw;transition:background .4s,padding .4s}
+nav.solid{background:rgba(5,6,15,.72);backdrop-filter:blur(14px);padding:9px 5vw;border-bottom:1px solid var(--line)}
+.logo{font-family:var(--head);font-weight:800;font-size:1.05rem;display:flex;align-items:center;gap:10px}
+.logo i{width:22px;height:22px;border-radius:50%;background:conic-gradient(var(--cyan),var(--violet),var(--magenta),var(--cyan));animation:spin 6s linear infinite;box-shadow:0 0 18px var(--violet)}
+.menu{display:flex;gap:6px}
+.menu a{padding:8px 16px;border-radius:99px;font-size:.92rem;color:var(--dim);transition:.3s}
+.menu a:hover{color:var(--star)}
+.menu a.on{color:var(--star);background:var(--glass);box-shadow:inset 0 0 0 1px var(--line)}
+.burger{display:none;background:none;border:1px solid var(--line);color:var(--star);padding:7px 13px;border-radius:10px;font-size:1.1rem;cursor:pointer}
+
+/* PROGRESS */
+#bar{position:fixed;top:0;left:0;height:3px;width:0;z-index:30;background:linear-gradient(90deg,var(--cyan),var(--violet),var(--magenta))}
+
+/* PAGES */
+main{position:relative;z-index:5}
+.page{display:none;min-height:100vh;padding:110px 6vw 90px}
+.page.show{display:block}
+.wrap{max-width:1100px;margin:auto}
+.hero{min-height:calc(100vh - 200px);display:flex;flex-direction:column;justify-content:center;max-width:760px}
+.hero .tag{color:var(--cyan);font-size:.95rem;margin-bottom:18px;min-height:1.7em}
+.hero .tag b{border-right:2px solid var(--cyan);padding-right:4px;animation:blink .8s steps(1) infinite;font-weight:400}
+.hero h1{font-size:clamp(2.3rem,7vw,5rem);font-weight:800;background:linear-gradient(100deg,#fff 10%,var(--cyan) 45%,var(--magenta));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{margin:22px 0 34px;max-width:540px;font-size:1.12rem;color:var(--dim)}
+.btn{display:inline-block;padding:14px 30px;border-radius:99px;font-weight:600;border:1px solid var(--line);margin-right:12px;margin-bottom:10px;transition:.35s;cursor:pointer;background:none;color:var(--star);font-family:var(--body);font-size:1rem}
+.btn.main{background:linear-gradient(100deg,var(--violet),var(--magenta));border:0;box-shadow:0 8px 34px rgba(122,92,255,.45)}
+.btn:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(255,79,163,.4)}
+.scrollhint{margin-top:50px;color:var(--dim);font-size:.85rem;display:flex;align-items:center;gap:10px}
+.scrollhint span{width:1px;height:46px;background:linear-gradient(var(--cyan),transparent);animation:drop 1.6s ease-in-out infinite}
+
+h2.title{font-size:clamp(1.6rem,4vw,2.7rem);margin-bottom:12px}
+.lead{color:var(--dim);max-width:620px;margin-bottom:42px}
+section.blk{margin:90px 0}
+
+/* KARTU */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px}
+.card{background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:22px;padding:30px;transition:transform .25s ease-out,border-color .3s;transform-style:preserve-3d;will-change:transform}
+.card:hover{border-color:var(--cyan)}
+.card .ico{font-size:2rem;margin-bottom:14px;display:block;filter:drop-shadow(0 0 12px var(--violet))}
+.card h3{font-size:1.05rem;margin-bottom:8px}
+.card p{color:var(--dim);font-size:.96rem}
+.price{font-family:var(--head);font-size:1.5rem;margin:14px 0 6px;color:var(--cyan)}
+.card.hot{border-color:var(--magenta);box-shadow:0 0 50px rgba(255,79,163,.18)}
+
+/* STATISTIK */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:18px;text-align:center}
+.stat{padding:26px 10px;border-radius:20px;border:1px solid var(--line);background:var(--glass)}
+.stat b{font-family:var(--head);font-size:2.2rem;display:block;background:linear-gradient(var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat span{color:var(--dim);font-size:.9rem}
+
+/* MARQUEE */
+.marq{overflow:hidden;border-block:1px solid var(--line);padding:16px 0;margin:70px -6vw;background:rgba(10,8,34,.5)}
+.marq div{display:flex;gap:60px;width:max-content;animation:slide 26s linear infinite;font-family:var(--head);font-size:1.15rem;color:var(--dim)}
+.marq em{color:var(--magenta);font-style:normal}
+
+/* TIMELINE (urutan nyata = langkah kerja) */
+.steps{position:relative;margin-left:14px;padding-left:34px;border-left:1px dashed var(--line)}
+.step{position:relative;margin-bottom:34px}
+.step::before{content:"";position:absolute;left:-43px;top:8px;width:18px;height:18px;border-radius:50%;background:var(--void);border:2px solid var(--cyan);box-shadow:0 0 14px var(--cyan)}
+.step h3{font-size:1.02rem;margin-bottom:4px}
+.step p{color:var(--dim)}
+
+/* PROFIL / BIODATA */
+.profile{display:grid;grid-template-columns:300px 1fr;gap:44px;align-items:start}
+.avatar{aspect-ratio:1;border-radius:50%;position:relative;display:grid;place-items:center;font-family:var(--head);font-size:4.2rem;font-weight:800;background:radial-gradient(circle at 30% 25%,#2b2370,var(--deep));border:1px solid var(--line)}
+.avatar::before{content:"";position:absolute;inset:-14px;border-radius:50%;border:1px dashed var(--cyan);animation:spin 22s linear infinite}
+.avatar::after{content:"";position:absolute;inset:-34px;border-radius:50%;border:1px solid var(--line);animation:spin 40s linear infinite reverse}
+.avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover;position:absolute;inset:0}
+.bio{width:100%;border-collapse:collapse}
+.bio td{padding:14px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+.bio td:first-child{color:var(--cyan);width:34%;font-size:.93rem}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{padding:8px 16px;border-radius:99px;border:1px solid var(--line);background:var(--glass);font-size:.9rem;transition:.3s}
+.chip:hover{border-color:var(--magenta);transform:translateY(-3px)}
+.skill{margin-bottom:18px}
+.skill div{display:flex;justify-content:space-between;font-size:.93rem;margin-bottom:6px}
+.skill .track{height:7px;border-radius:9px;background:rgba(255,255,255,.08);overflow:hidden}
+.skill .fill{height:100%;width:0;border-radius:9px;background:linear-gradient(90deg,var(--cyan),var(--violet),var(--magenta));transition:width 1.6s cubic-bezier(.2,.8,.2,1)}
+.on-screen .fill{width:var(--w)}
+
+/* KONTAK */
+.contact{display:grid;grid-template-columns:1fr 1.1fr;gap:34px}
+.cp{display:flex;gap:16px;align-items:center;padding:20px;border-radius:18px;border:1px solid var(--line);background:var(--glass);margin-bottom:16px;transition:.3s}
+.cp:hover{border-color:var(--cyan);transform:translateX(8px)}
+.cp .ico{font-size:1.6rem}
+.cp small{color:var(--dim);display:block;font-size:.82rem}
+form{display:flex;flex-direction:column;gap:14px}
+input,textarea{background:rgba(10,8,34,.7);border:1px solid var(--line);border-radius:14px;padding:14px 16px;color:var(--star);font-family:var(--body);font-size:1rem;outline:none;transition:.3s}
+input:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(77,225,255,.15)}
+textarea{min-height:130px;resize:vertical}
+#notif{color:var(--cyan);min-height:1.5em;font-size:.93rem}
+
+footer{position:relative;z-index:5;text-align:center;padding:40px 6vw;color:var(--dim);font-size:.88rem;border-top:1px solid var(--line);background:rgba(5,6,15,.6)}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(34px) scale(.98);filter:blur(6px);transition:opacity .9s,transform .9s cubic-bezier(.2,.8,.2,1),filter .9s}
+.rv.in{opacity:1;transform:none;filter:none}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes blink{50%{border-color:transparent}}
+@keyframes drop{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+@keyframes slide{to{transform:translateX(-50%)}}
+
+@media(max-width:820px){
+  .burger{display:block}
+  .menu{position:fixed;top:60px;right:4vw;flex-direction:column;background:rgba(10,8,34,.95);border:1px solid var(--line);border-radius:18px;padding:10px;display:none}
+  .menu.open{display:flex}
+  .profile,.contact{grid-template-columns:1fr}
+  .avatar{max-width:230px;margin:auto}
+}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none;filter:none}}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<canvas id="bg"></canvas>
+<div class="vignette"></div>
+
+<nav id="nav">
+  <a href="#beranda" class="logo"><i></i>[NAMA BISNIS]</a>
+  <button class="burger" id="burger" aria-label="Menu">☰</button>
+  <div class="menu" id="menu">
+    <a href="#beranda">Beranda</a>
+    <a href="#bisnis">Bisnis</a>
+    <a href="#profil">Profil</a>
+    <a href="#biodata">Biodata</a>
+    <a href="#kontak">Kontak</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ================= HALAMAN 1: BERANDA ================= -->
+<div class="page" id="p-beranda">
+  <div class="wrap">
+    <div class="hero">
+      <div class="tag"><b id="typed"></b></div>
+      <h1>[NAMA BISNIS]<br>Menembus Batas Semesta</h1>
+      <p>[TAGLINE BISNIS — satu kalimat singkat tentang apa yang kamu tawarkan dan untuk siapa.]</p>
+      <div>
+        <a href="#bisnis" class="btn main">Lihat Layanan</a>
+        <a href="#kontak" class="btn">Hubungi Kami</a>
+      </div>
+      <div class="scrollhint"><span></span>Gulir untuk menjelajah</div>
+    </div>
+
+    <div class="marq"><div id="marq1"></div></div>
+
+    <section class="blk">
+      <h2 class="title rv">Kenapa [NAMA BISNIS]?</h2>
+      <p class="lead rv">[Paragraf singkat tentang nilai utama bisnis kamu.]</p>
+      <div class="grid">
+        <div class="card rv"><span class="ico">🚀</span><h3>Cepat &amp; Tepat</h3><p>[Keunggulan 1 — jelaskan dalam satu-dua kalimat.]</p></div>
+        <div class="card rv"><span class="ico">🛰️</span><h3>Terhubung Selalu</h3><p>[Keunggulan 2 — jelaskan dalam satu-dua kalimat.]</p></div>
+        <div class="card rv"><span class="ico">🌌</span><h3>Tanpa Batas</h3><p>[Keunggulan 3 — jelaskan dalam satu-dua kalimat.]</p></div>
+      </div>
+    </section>
+
+    <section class="blk">
+      <div class="stats rv" id="stats">
+        <div class="stat"><b data-n="120">0</b><span>Pelanggan</span></div>
+        <div class="stat"><b data-n="45">0</b><span>Proyek Selesai</span></div>
+        <div class="stat"><b data-n="3">0</b><span>Tahun Berjalan</span></div>
+        <div class="stat"><b data-n="99">0</b><span>% Puas</span></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ================= HALAMAN 2: BISNIS ================= -->
+<div class="page" id="p-bisnis">
+  <div class="wrap">
+    <h2 class="title rv">Layanan &amp; Produk</h2>
+    <p class="lead rv">[Deskripsi umum bisnis: jenis usaha, target pelanggan, dan apa yang membuatnya berbeda.]</p>
+    <div class="grid">
+      <div class="card rv"><span class="ico">🪐</span><h3>[Produk / Layanan A]</h3><p>[Deskripsi singkat produk atau layanan A.]</p><div class="price">Rp [HARGA]</div></div>
+      <div class="card rv hot"><span class="ico">☄️</span><h3>[Produk / Layanan B] — Terlaris</h3><p>[Deskripsi singkat produk atau layanan B.]</p><div class="price">Rp [HARGA]</div></div>
+      <div class="card rv"><span class="ico">🌠</span><h3>[Produk / Layanan C]</h3><p>[Deskripsi singkat produk atau layanan C.]</p><div class="price">Rp [HARGA]</div></div>
+    </div>
+
+    <section class="blk">
+      <h2 class="title rv">Cara Kerja</h2>
+      <p class="lead rv">Dari pesan pertama sampai barang atau jasa sampai di tanganmu.</p>
+      <div class="steps">
+        <div class="step rv"><h3>Pilih layanan</h3><p>[Pelanggan memilih produk atau paket yang sesuai.]</p></div>
+        <div class="step rv"><h3>Konsultasi &amp; pesan</h3><p>[Diskusi kebutuhan lewat WhatsApp atau formulir.]</p></div>
+        <div class="step rv"><h3>Proses pengerjaan</h3><p>[Pesanan dikerjakan dan dikabari tiap tahap.]</p></div>
+        <div class="step rv"><h3>Selesai &amp; terima</h3><p>[Hasil dikirim atau diserahkan ke pelanggan.]</p></div>
+      </div>
+    </section>
+
+    <section class="blk">
+      <h2 class="title rv">Kata Mereka</h2>
+      <div class="grid">
+        <div class="card rv"><p>“[Contoh testimoni pelanggan 1.]”</p><h3 style="margin-top:14px">[Nama Pelanggan]</h3></div>
+        <div class="card rv"><p>“[Contoh testimoni pelanggan 2.]”</p><h3 style="margin-top:14px">[Nama Pelanggan]</h3></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ================= HALAMAN 3: PROFIL ================= -->
+<div class="page" id="p-profil">
+  <div class="wrap">
+    <h2 class="title rv">Profil [NAMA BISNIS]</h2>
+    <p class="lead rv">[Cerita singkat tentang bagaimana bisnis ini dimulai dan alasan di baliknya.]</p>
+    <div class="grid">
+      <div class="card rv"><span class="ico">🔭</span><h3>Visi</h3><p>[Tulis visi bisnis di sini.]</p></div>
+      <div class="card rv"><span class="ico">🧭</span><h3>Misi</h3><p>[Tulis misi bisnis di sini.]</p></div>
+      <div class="card rv"><span class="ico">💎</span><h3>Nilai</h3><p>[Nilai-nilai yang dipegang: jujur, rapi, tepat waktu, dll.]</p></div>
+    </div>
+    <section class="blk">
+      <h2 class="title rv">Perjalanan</h2>
+      <div class="steps">
+        <div class="step rv"><h3>[TAHUN] — Mulai</h3><p>[Bisnis pertama kali dirintis.]</p></div>
+        <div class="step rv"><h3>[TAHUN] — Berkembang</h3><p>[Pencapaian atau produk baru.]</p></div>
+        <div class="step rv"><h3>[TAHUN] — Sekarang</h3><p>[Kondisi dan rencana ke depan.]</p></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ================= HALAMAN 4: BIODATA ================= -->
+<div class="page" id="p-biodata">
+  <div class="wrap">
+    <h2 class="title rv">Biodata Pemilik</h2>
+    <p class="lead rv">Orang di balik [NAMA BISNIS].</p>
+    <div class="profile">
+      <div class="rv">
+        <div class="avatar">
+          <!-- Ganti dengan foto: <img src="foto.jpg" alt="Foto Titan"> -->
+          TY
+        </div>
+      </div>
+      <div class="rv">
+        <table class="bio">
+          <tr><td>Nama Lengkap</td><td>Titan Yama Rizqi On</td></tr>
+          <tr><td>Sekolah</td><td>SMK Ma'arif NU 1 Ajibarang</td></tr>
+          <tr><td>Jurusan / Kelas</td><td>Teknik Komputer &amp; Jaringan (TKJ) — XII TKJ B</td></tr>
+          <tr><td>Cita-cita</td><td>Software Engineer</td></tr>
+          <tr><td>Rencana Lanjut</td><td>Kuliah di PTN (UI, UGM, ITB, UNNES, UNDIP, UNAIR, dll.)</td></tr>
+          <tr><td>Hobi</td><td>Berolahraga, membaca, belajar ilmu komputer</td></tr>
+          <tr><td>Instagram</td><td><a href="https://instagram.com/yyyamaa_" target="_blank" rel="noopener">@yyyamaa_</a></td></tr>
+          <tr><td>TikTok</td><td><a href="https://tiktok.com/@yyyamaa_" target="_blank" rel="noopener">@yyyamaa_</a> · <a href="https://tiktok.com/@akuyamaa" target="_blank" rel="noopener">@akuyamaa</a></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <section class="blk">
+      <h2 class="title rv">Keahlian</h2>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+        <div class="rv skillbox">
+          <div class="skill"><div><span>Jaringan (MikroTik)</span><span>80%</span></div><div class="track"><div class="fill" style="--w:80%"></div></div></div>
+          <div class="skill"><div><span>Instalasi Linux / Debian</span><span>75%</span></div><div class="track"><div class="fill" style="--w:75%"></div></div></div>
+          <div class="skill"><div><span>Instalasi Windows &amp; Rakit PC</span><span>85%</span></div><div class="track"><div class="fill" style="--w:85%"></div></div></div>
+          <div class="skill"><div><span>Coding (VSCode)</span><span>55%</span></div><div class="track"><div class="fill" style="--w:55%"></div></div></div>
+        </div>
+        <div class="rv">
+          <div class="chips">
+            <span class="chip">Bongkar CPU</span><span class="chip">Windows</span><span class="chip">Debian</span><span class="chip">Linux</span>
+            <span class="chip">MikroTik</span><span class="chip">Word</span><span class="chip">Excel</span>
+            <span class="chip">CapCut</span><span class="chip">Alight Motion</span><span class="chip">VSCode</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ================= HALAMAN 5: KONTAK ================= -->
+<div class="page" id="p-kontak">
+  <div class="wrap">
+    <h2 class="title rv">Hubungi Kami</h2>
+    <p class="lead rv">Punya pertanyaan atau mau pesan? Kirim sinyal ke kami.</p>
+    <div class="contact">
+      <div class="rv">
+        <a class="cp" href="https://wa.me/62XXXXXXXXXXX" target="_blank" rel="noopener"><span class="ico">💬</span><div><small>Contact Person · WhatsApp</small>+62 XXX-XXXX-XXXX ([NAMA CP])</div></a>
+        <a class="cp" href="mailto:email@contoh.com"><span class="ico">✉️</span><div><small>Email</small>email@contoh.com</div></a>
+        <a class="cp" href="https://instagram.com/yyyamaa_" target="_blank" rel="noopener"><span class="ico">📸</span><div><small>Instagram</small>@yyyamaa_</div></a>
+        <a class="cp" href="https://tiktok.com/@akuyamaa" target="_blank" rel="noopener"><span class="ico">🎵</span><div><small>TikTok</small>@akuyamaa</div></a>
+        <div class="cp"><span class="ico">📍</span><div><small>Alamat</small>[ALAMAT BISNIS], Ajibarang, Banyumas</div></div>
+      </div>
+      <div class="rv card">
+        <form id="form">
+          <input type="text" placeholder="Nama kamu" required>
+          <input type="email" placeholder="Email atau nomor WhatsApp" required>
+          <textarea placeholder="Tulis pesanmu..." required></textarea>
+          <button class="btn main" type="submit">Kirim Pesan</button>
+          <div id="notif"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+<footer>© <span id="yr"></span> [NAMA BISNIS] · Dibuat oleh Titan Yama Rizqi On</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ============ 3D SCENE ============ */
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const canvas = document.getElementById('bg');
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x05060f, 0.012);
+const camera = new THREE.PerspectiveCamera(60, 1, .1, 400);
+camera.position.set(0, 0, 40);
+
+// bintang 2 lapis
+function starLayer(n, size, spread){
+  const g = new THREE.BufferGeometry(), p = new Float32Array(n*3);
+  for(let i=0;i<n*3;i++) p[i] = (Math.random()-.5)*spread;
+  g.setAttribute('position', new THREE.BufferAttribute(p,3));
+  return new THREE.Points(g, new THREE.PointsMaterial({size, color:0xffffff, transparent:true, opacity:.85, sizeAttenuation:true}));
+}
+const starsA = starLayer(2500, .5, 300), starsB = starLayer(900, 1.1, 220);
+scene.add(starsA, starsB);
+
+// galaksi spiral
+const GN = 22000, gg = new THREE.BufferGeometry();
+const gp = new Float32Array(GN*3), gc = new Float32Array(GN*3);
+const cIn = new THREE.Color('#ff4fa3'), cMid = new THREE.Color('#7a5cff'), cOut = new THREE.Color('#4de1ff');
+for(let i=0;i<GN;i++){
+  const r = Math.pow(Math.random(), 1.6) * 38;
+  const arm = (i % 4) / 4 * Math.PI * 2;
+  const a = arm + r * .26;
+  const rnd = () => Math.pow(Math.random(), 3) * (Math.random()<.5?1:-1) * (.6 + r*.07);
+  gp[i*3] = Math.cos(a)*r + rnd();
+  gp[i*3+1] = rnd() * .5;
+  gp[i*3+2] = Math.sin(a)*r + rnd();
+  const c = cIn.clone().lerp(cMid, Math.min(r/16,1)).lerp(cOut, Math.max((r-16)/22,0));
+  gc[i*3]=c.r; gc[i*3+1]=c.g; gc[i*3+2]=c.b;
+}
+gg.setAttribute('position', new THREE.BufferAttribute(gp,3));
+gg.setAttribute('color', new THREE.BufferAttribute(gc,3));
+const galaxy = new THREE.Points(gg, new THREE.PointsMaterial({size:.22, vertexColors:true, transparent:true, opacity:.9, blending:THREE.AdditiveBlending, depthWrite:false}));
+galaxy.position.set(0,-6,-30); galaxy.rotation.x = .5;
+scene.add(galaxy);
+
+// planet bercincin
+scene.add(new THREE.AmbientLight(0x6a5cff, .55));
+const sun = new THREE.PointLight(0xffd7f0, 2.4, 300); sun.position.set(30,20,25); scene.add(sun);
+const planetGroup = new THREE.Group(); planetGroup.position.set(14,2,-6);
+const planet = new THREE.Mesh(new THREE.SphereGeometry(5,64,64), new THREE.MeshStandardMaterial({color:0x5b3fd6, roughness:.75, metalness:.15, emissive:0x1a0f55, emissiveIntensity:.6}));
+const atmo = new THREE.Mesh(new THREE.SphereGeometry(5.4,48,48), new THREE.MeshBasicMaterial({color:0x4de1ff, transparent:true, opacity:.08, side:THREE.BackSide}));
+const ring = new THREE.Mesh(new THREE.RingGeometry(7.2,10.5,128), new THREE.MeshBasicMaterial({color:0xff4fa3, transparent:true, opacity:.4, side:THREE.DoubleSide}));
+ring.rotation.x = Math.PI/2.4;
+planetGroup.add(planet, atmo, ring); scene.add(planetGroup);
+
+// bulan kecil
+const moon = new THREE.Mesh(new THREE.SphereGeometry(1,32,32), new THREE.MeshStandardMaterial({color:0xcfd3ff, roughness:.9}));
+scene.add(moon);
+
+// objek 3D wireframe melayang (satelit / kristal)
+const knot = new THREE.Mesh(new THREE.TorusKnotGeometry(3,.9,160,20), new THREE.MeshBasicMaterial({color:0x4de1ff, wireframe:true, transparent:true, opacity:.5}));
+knot.position.set(-16,-3,-8); scene.add(knot);
+const crystal = new THREE.Mesh(new THREE.IcosahedronGeometry(2.6,0), new THREE.MeshStandardMaterial({color:0xff4fa3, flatShading:true, emissive:0x6a1040, roughness:.3}));
+crystal.position.set(-8,10,-14); scene.add(crystal);
+
+// meteor
+const meteors = [];
+for(let i=0;i<6;i++){
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(.03,.03,6,6), new THREE.MeshBasicMaterial({color:0xffffff, transparent:true, opacity:0}));
+  m.userData = {t: Math.random()*400, v: .6+Math.random()*.7};
+  scene.add(m); meteors.push(m);
+}
+
+// kamera tiap halaman
+const views = {
+  beranda:{p:[0,0,40], gy:0},
+  bisnis:{p:[-14,5,30], gy:1.2},
+  profil:{p:[16,-6,34], gy:2.4},
+  biodata:{p:[0,10,26], gy:3.6},
+  kontak:{p:[-8,-8,22], gy:4.8}
+};
+let page = 'beranda', mx=0, my=0, sp=0, spS=0;
+addEventListener('mousemove', e=>{ mx = e.clientX/innerWidth-.5; my = e.clientY/innerHeight-.5; });
+
+function resize(){
+  renderer.setSize(innerWidth, innerHeight, false);
+  camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize); resize();
+
+const clock = new THREE.Clock();
+const tgt = new THREE.Vector3(), look = new THREE.Vector3();
+let gyCur = 0;
+function loop(){
+  const t = clock.getElapsedTime();
+  spS += (sp - spS) * .06;
+  const v = views[page];
+  // posisi kamera = posisi halaman + efek scroll (maju ke dalam galaksi) + parallax mouse
+  tgt.set(v.p[0] + mx*5, v.p[1] - my*3 - spS*8, v.p[2] - spS*22);
+  camera.position.lerp(tgt, .035);
+  look.set(0, -spS*4, -10); camera.lookAt(look);
+  camera.rotation.z = spS * .35 + mx*.03;
+
+  gyCur += (v.gy - gyCur) * .03;
+  galaxy.rotation.y = t*.03 + gyCur + spS*1.5;
+  galaxy.rotation.z = spS*.4;
+  starsA.rotation.y = t*.004 + spS*.2; starsB.rotation.y = -t*.006;
+  planet.rotation.y = t*.08; ring.rotation.z = t*.05;
+  planetGroup.position.y = 2 + Math.sin(t*.4)*.8 - spS*5;
+  moon.position.set(planetGroup.position.x + Math.cos(t*.5)*12, planetGroup.position.y + Math.sin(t*.5)*2, planetGroup.position.z + Math.sin(t*.5)*12);
+  knot.rotation.x = t*.25 + spS*3; knot.rotation.y = t*.18;
+  crystal.rotation.x = t*.4; crystal.rotation.y = t*.3; crystal.position.y = 10 + Math.sin(t*.7)*1.2;
+  meteors.forEach(m=>{
+    const d=m.userData; d.t += d.v;
+    const k = (d.t % 420)/420;
+    m.position.set(70-k*150, 40-k*70 + (m.id%5)*6, -30);
+    m.rotation.z = 1.05; m.material.opacity = k<.1||k>.9 ? 0 : .8;
+  });
+  renderer.render(scene, camera);
+  if(!reduce) requestAnimationFrame(loop);
+}
+reduce ? renderer.render(scene,camera) : loop();
+
+/* ============ HALAMAN & NAVIGASI ============ */
+const pages = ['beranda','bisnis','profil','biodata','kontak'];
+const menuLinks = document.querySelectorAll('.menu a');
+const nav = document.getElementById('nav');
+let io;
+
+function go(){
+  let h = location.hash.replace('#','');
+  if(!pages.includes(h)) h = 'beranda';
+  page = h;
+  document.querySelectorAll('.page').forEach(p => p.classList.toggle('show', p.id === 'p-'+h));
+  menuLinks.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#'+h));
+  document.getElementById('menu').classList.remove('open');
+  scrollTo({top:0, behavior:'instant'});
+  document.title = h.charAt(0).toUpperCase()+h.slice(1) + ' — [NAMA BISNIS]';
+  observe();
+}
+addEventListener('hashchange', go);
+
+/* efek muncul saat scroll + isi bar skill + hitung angka */
+function observe(){
+  if(io) io.disconnect();
+  io = new IntersectionObserver(es => es.forEach(e => {
+    if(!e.isIntersecting) return;
+    e.target.classList.add('in');
+    if(e.target.classList.contains('skillbox')) e.target.classList.add('on-screen');
+    if(e.target.id === 'stats') countUp(e.target);
+    io.unobserve(e.target);
+  }), {threshold:.15});
+  document.querySelectorAll('.page.show .rv').forEach(el => { el.classList.remove('in','on-screen'); io.observe(el); });
+}
+function countUp(box){
+  box.querySelectorAll('[data-n]').forEach(b => {
+    const n = +b.dataset.n, t0 = performance.now();
+    (function s(t){ const k = Math.min((t-t0)/1500,1); b.textContent = Math.round(n*(1-Math.pow(1-k,3))); if(k<1) requestAnimationFrame(s); })(t0);
+  });
+}
+
+/* scroll: progress bar, nav, progres 3D, parallax kartu */
+addEventListener('scroll', () => {
+  const max = document.documentElement.scrollHeight - innerHeight;
+  sp = max > 0 ? scrollY / max : 0;
+  document.getElementById('bar').style.width = (sp*100) + '%';
+  nav.classList.toggle('solid', scrollY > 40);
+}, {passive:true});
+
+/* kartu miring 3D mengikuti kursor */
+document.addEventListener('mousemove', e => {
+  const c = e.target.closest && e.target.closest('.card');
+  document.querySelectorAll('.card').forEach(x => { if(x !== c) x.style.transform=''; });
+  if(!c || reduce) return;
+  const r = c.getBoundingClientRect();
+  const x = (e.clientX-r.left)/r.width-.5, y = (e.clientY-r.top)/r.height-.5;
+  c.style.transform = `perspective(700px) rotateY(${x*12}deg) rotateX(${-y*12}deg) translateZ(8px)`;
+});
+
+/* teks mengetik */
+const words = ['Selamat datang di [NAMA BISNIS]','Layanan [JENIS BISNIS] terpercaya','Siap melayani kebutuhanmu'];
+let wi=0, ci=0, del=false; const typed = document.getElementById('typed');
+(function type(){
+  const w = words[wi];
+  typed.textContent = w.slice(0, ci);
+  if(!del && ci++ === w.length){ del = true; return setTimeout(type, 1600); }
+  if(del && --ci < 0){ del=false; ci=0; wi=(wi+1)%words.length; }
+  setTimeout(type, del ? 28 : 60);
+})();
+
+/* marquee */
+const items = ['Produk Unggulan','Layanan Cepat','Harga Bersahabat','Dukungan 24 Jam','Kualitas Terjamin'];
+document.getElementById('marq1').innerHTML = [...items,...items,...items,...items].map(t => `<span>${t}</span><em>✦</em>`).join('');
+
+/* menu mobile & form */
+document.getElementById('burger').onclick = () => document.getElementById('menu').classList.toggle('open');
+document.getElementById('form').addEventListener('submit', e => {
+  e.preventDefault();
+  document.getElementById('notif').textContent = 'Pesan terkirim ke orbit! (Hubungkan form ke WhatsApp/email/backend agar benar-benar terkirim.)';
+  e.target.reset();
+});
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+go();
+</script>
+</body>
+</html>
